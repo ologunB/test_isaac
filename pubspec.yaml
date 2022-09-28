@@ -1,4 +1,4 @@
-name: test_isaac
+name: flagmodeapp12
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -30,8 +30,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^1.11.0
-  firebase_auth: ^3.3.5
+  firebase_core: ^1.10.0
+  firebase_auth: ^3.1.0
+ # cloud_firestore: 2.5.1
+  flutter_staggered_grid_view: ^0.6.2
+  dotted_border: ^2.0.0+2
+  file_picker: ^4.5.0
 
 dev_dependencies:
   flutter_test:
@@ -56,8 +60,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -71,10 +75,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: NotoSerif
+      fonts:
+        - asset: assets/fonts/NotoSerif-Bold.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

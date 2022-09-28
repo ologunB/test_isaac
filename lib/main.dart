@@ -1,7 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flagmodeapp12/screens/auth/splash.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(const FlagMode());
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const FlagMode());
+}
 
 class FlagMode extends StatelessWidget {
   const FlagMode({Key? key}) : super(key: key);

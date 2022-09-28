@@ -1,5 +1,8 @@
-import 'package:flagmodeapp12/screens/home/chat_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flagmodeapp12/screens/auth/welcomesecreen.dart';
 import 'package:flagmodeapp12/widgets/back_button.dart';
+import 'package:flagmodeapp12/widgets/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
 
@@ -11,6 +14,10 @@ class VerifyScreen extends StatefulWidget {
 }
 
 class _VerifyScreenState extends State<VerifyScreen> {
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   bool isChecked = false;
   @override
   Widget build(BuildContext context) {
@@ -47,8 +54,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  controller: fullNameController,
+                  decoration: const InputDecoration(
                     filled: true,
                     hintText: 'Name',
                     helperStyle: TextStyle(color: Colors.white),
@@ -63,8 +71,10 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 const SizedBox(
                   height: 16.0,
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  keyboardType: TextInputType.emailAddress,
+                  controller: emailController,
+                  decoration: const InputDecoration(
                     filled: true,
                     hintText: 'Email',
                     helperStyle: TextStyle(color: Colors.white),
@@ -79,8 +89,10 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 const SizedBox(
                   height: 16.0,
                 ),
-                const TextField(
-                  decoration: InputDecoration(
+                TextField(
+                  obscureText: true,
+                  controller: passwordController,
+                  decoration: const InputDecoration(
                     filled: true,
                     hintText: 'Password',
                     helperStyle: TextStyle(color: Colors.white),
@@ -121,12 +133,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                 Card(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const ChatScreen();
-                        }),
-                      );
+                      createAccount();
                     },
                     child: Padding(
                       padding: const EdgeInsets.all(18.0),
@@ -134,7 +141,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
                           Text(
-                            'Log In',
+                            'Sign In',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -155,5 +162,39 @@ class _VerifyScreenState extends State<VerifyScreen> {
         ),
       ),
     );
+  }
+
+  void createAccount() async {
+    if (fullNameController.text.isEmpty) {
+      Utils.showNotif(context, 'Enter full name');
+      return;
+    }
+    if (emailController.text.isEmpty) {
+      Utils.showNotif(context, 'Email cannot be empty');
+      return;
+    }
+    if (passwordController.text.isEmpty) {
+      Utils.showNotif(context, 'Password is empty');
+
+      return;
+    }
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    String email = emailController.text;
+    String password = passwordController.text;
+    try {
+      UserCredential userCredential = await firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      if (userCredential.user != null) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            CupertinoPageRoute(builder: (context) => WelcomeScreen()),
+            (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      Utils.showNotif(context, e.message!);
+    } catch (e) {
+      Utils.showNotif(context, e.toString());
+    }
   }
 }

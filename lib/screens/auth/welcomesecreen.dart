@@ -18,7 +18,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         padding: const EdgeInsets.all(16.0),
         child: CustomButton(
           onPressed: () {},
-          title: 'Sign in',
+          title: 'Log In',
         ),
       ),
       body: SafeArea(
@@ -62,6 +62,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 const SizedBox(height: 24),
                 const TextField(
+                  obscureText: true,
                   decoration: InputDecoration(
                     filled: true,
                     hintText: 'Password',
@@ -92,7 +93,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) {
-                        return const VerifyScreen();
+                        return VerifyScreen();
                       }),
                     );
                   },
