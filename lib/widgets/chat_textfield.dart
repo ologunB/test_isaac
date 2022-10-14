@@ -1,4 +1,3 @@
-import 'package:flagmodeapp12/widgets/utils.dart';
 import 'package:flutter/material.dart';
 
 class ChatTextField extends StatefulWidget {

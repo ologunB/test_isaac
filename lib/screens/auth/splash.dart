@@ -43,32 +43,35 @@ class _SplashScreenState extends State<SplashScreen> {
               const Icon(Icons.flutter_dash, color: Colors.white, size: 60),
               const Spacer(),
               if (FirebaseAuth.instance.currentUser == null)
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) {
-                        return const LoginScreen();
-                      }),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
-                          'Get Started',
-                          style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
-                        )
-                      ],
+                SafeArea(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) {
+                          return const LoginScreen();
+                        }),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Text(
+                            'Get Started',
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          )
+                        ],
+                      ),
                     ),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white)),
                   ),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.white)),
                 )
             ],
           ),

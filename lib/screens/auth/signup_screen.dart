@@ -18,6 +18,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _obscureText = true;
 
   bool isChecked = false;
   @override
@@ -91,11 +92,21 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 16.0,
                 ),
                 TextField(
-                  obscureText: true,
+                  obscureText: _obscureText,
                   controller: passwordController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     filled: true,
                     hintText: 'Password',
+                    suffixIcon: IconButton(
+                      color: AppColors.darkGrey,
+                      onPressed: () {
+                        _obscureText = !_obscureText;
+                        setState(() {});
+                      },
+                      icon: Icon(_obscureText
+                          ? Icons.visibility
+                          : Icons.visibility_off),
+                    ),
                     helperStyle: TextStyle(color: Colors.white),
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
@@ -116,7 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         value: isChecked,
                         onChanged: (value) {
                           setState(() {
-                            isChecked = false;
+                            isChecked = !isChecked;
                           });
                         }),
                     const Center(
@@ -133,9 +144,15 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 Card(
                   child: ElevatedButton(
-                    onPressed: () {
-                      createAccount();
-                    },
+                    onPressed: _isLoading
+                        ? null
+                        : () {
+                            if (!isChecked) {
+                              return Utils.showNotif(
+                                  context, 'Agree to terms and conditions');
+                            }
+                            createAccount();
+                          },
                     child: Padding(
                       padding: const EdgeInsets.all(18.0),
                       child: Row(

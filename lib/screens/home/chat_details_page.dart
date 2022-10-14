@@ -1,23 +1,20 @@
 import 'package:flagmodeapp12/models/message_model.dart';
 import 'package:flagmodeapp12/widgets/chat_textfield.dart';
-import 'package:flagmodeapp12/widgets/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:keyboard_attachable/keyboard_attachable.dart';
 
-import '../styles/colors.dart';
+import '../../styles/colors.dart';
 
-class jamesPage extends StatefulWidget {
-  const jamesPage({super.key, required this.index});
+class ChatDetailScreen extends StatefulWidget {
+  const ChatDetailScreen({super.key, required this.index});
 
   final int index;
   @override
-  State<jamesPage> createState() => _jamesPageState();
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _jamesPageState extends State<jamesPage> {
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
   TextEditingController textController = TextEditingController();
   @override
   Widget build(BuildContext context) {

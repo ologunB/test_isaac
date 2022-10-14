@@ -1,6 +1,6 @@
 import 'package:flagmodeapp12/models/message_model.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
-import 'package:flagmodeapp12/widgets/james_page.dart';
+import 'package:flagmodeapp12/screens/home/chat_details_page.dart';
 import 'package:flutter/material.dart';
 
 class Chatspage extends StatefulWidget {
@@ -37,7 +37,7 @@ class _ChatspageState extends State<Chatspage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) {
-                        return jamesPage(
+                        return ChatDetailScreen(
                           index: index,
                         );
                       }),

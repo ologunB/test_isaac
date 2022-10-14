@@ -1,6 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flagmodeapp12/screens/auth/BusinessDetails.dart';
-import 'package:flagmodeapp12/screens/auth/myprofile.dart';
 import 'package:flagmodeapp12/screens/auth/settings.dart';
 import 'package:flagmodeapp12/screens/auth/splash.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
@@ -8,6 +6,8 @@ import 'package:flagmodeapp12/widgets/chats_page.dart';
 import 'package:flagmodeapp12/widgets/groups_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'choose_user_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -28,7 +28,10 @@ class _ChatScreenState extends State<ChatScreen> {
           Icons.create,
           color: Colors.white,
         ),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => const ChooseUserScreen()));
+        },
       ),
       backgroundColor: AppColors.primaryColor,
       appBar: AppBar(

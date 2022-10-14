@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flagmodeapp12/screens/auth/signup_screen.dart';
 import 'package:flagmodeapp12/screens/home/chat_screen.dart';
-import 'package:flagmodeapp12/widgets/custom_button.dart';
 import 'package:flagmodeapp12/widgets/local_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +20,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
 
-  static String id = 'foget-password';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
