@@ -1,11 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
 import 'package:flagmodeapp12/widgets/local_storage.dart';
 import 'package:flagmodeapp12/widgets/utils.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+
+import '../../models/user_model.dart';
 
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
@@ -17,11 +21,14 @@ class MyProfile extends StatefulWidget {
 class _MyProfileState extends State<MyProfile> {
   TextEditingController name = TextEditingController();
   TextEditingController email = TextEditingController();
+  File? image;
+  String? imageUrl;
 
   @override
   void initState() {
-    name.text = AppCache.getName();
-    email.text = FirebaseAuth.instance.currentUser!.email!;
+    name.text = AppCache.getUser().name!;
+    email.text = AppCache.getUser().email!;
+    imageUrl = AppCache.getUser().image;
     super.initState();
   }
 
@@ -29,12 +36,14 @@ class _MyProfileState extends State<MyProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 100,
+        centerTitle: true,
         leading: Row(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap : () {
+                onTap: () {
                   Navigator.pop(context);
                 },
                 child: Text(
@@ -48,22 +57,17 @@ class _MyProfileState extends State<MyProfile> {
             ),
           ],
         ),
+        title: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Edit Profile',
+            style: TextStyle(
+                color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+          ),
+        ),
         elevation: 0,
         backgroundColor: AppColors.white,
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Edit Profile',
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600),
-            ),
-          ),
-          SizedBox(
-            width: 50,
-          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
@@ -71,9 +75,7 @@ class _MyProfileState extends State<MyProfile> {
                 elevation: MaterialStateProperty.all(0),
                 backgroundColor: MaterialStateProperty.all(AppColors.white),
               ),
-              onPressed: () {
-                saveProfile();
-              },
+              onPressed: saveProfile,
               child: Text(
                 'Done',
                 style: TextStyle(
@@ -122,10 +124,17 @@ class _MyProfileState extends State<MyProfile> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(50),
                               child: image == null
-                                  ? Image.asset(
-                                      'assets/images/james.png',
-                                      height: 90,
-                                      width: 90,
+                                  ? CachedNetworkImage(
+                                      imageUrl: imageUrl ??
+                                          'https://picsum.phommmtos/200',
+                                      placeholder: (context, url) =>
+                                          Image.asset(
+                                              'assets/images/placeholder.png'),
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset(
+                                              'assets/images/placeholder.png'),
+                                      height: 50,
+                                      width: 50,
                                     )
                                   : Image.file(
                                       image!,
@@ -159,7 +168,7 @@ class _MyProfileState extends State<MyProfile> {
                     height: 6,
                   ),
                   Text(
-                    'John Stone',
+                    name.text,
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w400,
@@ -203,6 +212,9 @@ class _MyProfileState extends State<MyProfile> {
                 ),
                 TextField(
                   controller: name,
+                  onChanged: (a) {
+                    setState(() {});
+                  },
                 ),
                 Text(
                   'Email Address',
@@ -224,15 +236,30 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  File? image;
+  saveProfile() async {
+    Reference reference = FirebaseStorage.instance
+        .ref()
+        .child("profiles/${AppCache.getUser().uid}");
 
-  saveProfile() {
+    if (image != null) {
+      UploadTask uploadTask = reference.putFile(image!);
+      TaskSnapshot downloadUrl = (await uploadTask.whenComplete(() => null));
+      imageUrl = await downloadUrl.ref.getDownloadURL();
+    }
+
+    print(imageUrl);
+
     FirebaseFirestore.instance
         .collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid)
-        .update({"name": name.text});
+        .update({"name": name.text, 'image': imageUrl});
 
-    AppCache.saveName(name.text);
+    AppCache.saveUser(UserModel(
+            name: name.text,
+            email: email.text,
+            image: imageUrl,
+            uid: AppCache.getUser().uid)
+        .toJson());
     Utils.showNotif(context, "Profile Updated");
   }
 }

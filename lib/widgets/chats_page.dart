@@ -1,4 +1,5 @@
-import 'package:flagmodeapp12/models/message_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flagmodeapp12/models/user_model.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
 import 'package:flagmodeapp12/screens/home/chat_details_page.dart';
 import 'package:flutter/material.dart';
@@ -25,10 +26,10 @@ class _ChatspageState extends State<Chatspage> {
               ),
             ),
             child: ListView.separated(
-              itemCount: allUsers.length,
+              itemCount: 3,
               separatorBuilder: (BuildContext context, int index) =>
                   const Padding(
-                padding: EdgeInsets.only(left: 50, top: 16, bottom: 16),
+                padding: EdgeInsets.only(left: 50, top: 8, bottom: 8),
                 child: Divider(),
               ),
               itemBuilder: (BuildContext context, int index) {
@@ -37,17 +38,24 @@ class _ChatspageState extends State<Chatspage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) {
-                        return ChatDetailScreen(
-                          index: index,
-                        );
+                        return ChatDetailScreen(user: UserModel());
                       }),
                     );
                   },
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        backgroundImage: AssetImage(allUsers[index].image),
-                        radius: 23.0,
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://firebasestorage.googleapis.com/v0/b/testisaac-4c1bf.appspot.com/o/mine.png?alt=media&token=847bcda4-a10b-4ff6-a259-b7e8f9641d26",
+                          placeholder: (context, url) =>
+                              Image.asset('assets/images/placeholder.png'),
+                          errorWidget: (context, url, error) =>
+                              Image.asset('assets/images/placeholder.png'),
+                          height: 50,
+                          width: 50,
+                        ),
                       ),
                       Expanded(
                         child: Padding(
@@ -58,7 +66,7 @@ class _ChatspageState extends State<Chatspage> {
                               Row(
                                 children: [
                                   Text(
-                                    allUsers[index].name,
+                                    'name',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 14,

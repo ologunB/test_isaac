@@ -205,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
           print(data);
 
-          AppCache.saveName(data['name']);
+          AppCache.saveUser(data);
           Navigator.pushAndRemoveUntil(
               context,
               CupertinoPageRoute(builder: (context) => ChatScreen()),

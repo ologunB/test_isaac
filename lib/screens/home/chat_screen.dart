@@ -7,6 +7,7 @@ import 'package:flagmodeapp12/widgets/groups_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../auth/myprofile.dart';
 import 'choose_user_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -71,7 +72,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Colors.black,
                   ),
                   onSelected: (int a) async {
-                    print(a);
+                    if (a == 1) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyProfile(),
+                        ),
+                      );
+                    }
                     if (a == 5) {
                       Navigator.push(
                         context,

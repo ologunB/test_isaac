@@ -1,7 +1,7 @@
+import 'package:flagmodeapp12/models/user_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 const String kBox = 'userBox';
-const String kName = 'namae';
 const String kUser = 'user';
 const String hasRated = 'hasRated';
 
@@ -15,12 +15,12 @@ class AppCache {
 
   String a = '';
 
-  static void saveName(String token) {
-    _box.put(kName, token);
+  static void saveUser(dynamic data) {
+    _box.put(kUser, data);
   }
 
-  static String getName() {
-    final String data = _box.get(kName) as String;
-    return data;
+  static UserModel getUser() {
+    final dynamic data = _box.get(kUser);
+    return UserModel.fromJson(data);
   }
 }

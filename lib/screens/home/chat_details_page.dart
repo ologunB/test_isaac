@@ -1,21 +1,22 @@
-import 'package:flagmodeapp12/models/message_model.dart';
 import 'package:flagmodeapp12/widgets/chat_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:keyboard_attachable/keyboard_attachable.dart';
 
+import '../../models/user_model.dart';
 import '../../styles/colors.dart';
 
 class ChatDetailScreen extends StatefulWidget {
-  const ChatDetailScreen({super.key, required this.index});
+  const ChatDetailScreen({super.key, required this.user});
 
-  final int index;
+  final UserModel user;
   @override
   State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   TextEditingController textController = TextEditingController();
+  ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,6 +27,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           child: ChatTextField(
             textController: textController,
             sendButtonColor: AppColors.primaryColor,
+            onSend: (a) {
+              scrollController.animateTo(
+                  scrollController.position.maxScrollExtent + 20,
+                  curve: Curves.easeOut,
+                  duration: const Duration(milliseconds: 300));
+              print(a);
+            },
           ),
         ),
         child: Column(children: [
@@ -42,7 +50,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(14.0),
+                padding: const EdgeInsets.symmetric(vertical: 14.0),
                 child: Row(
                   children: [
                     IconButton(
@@ -57,7 +65,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     ),
                     CircleAvatar(
                         backgroundImage:
-                            AssetImage(allUsers[widget.index].image),
+                            AssetImage('assets/images/placeholder.png'),
                         radius: 20),
                     SizedBox(width: 16),
                     Column(
@@ -65,7 +73,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          allUsers[widget.index].name,
+                          widget.user.name ?? '',
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -89,6 +97,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                         ),
                       ],
                     ),
+                    SizedBox(width: 16),
                   ],
                 ),
               ),
@@ -116,6 +125,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               child: ListView.builder(
                 itemCount: 18,
                 shrinkWrap: true,
+                controller: scrollController,
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) {
                   return Padding(

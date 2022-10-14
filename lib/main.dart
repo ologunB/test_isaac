@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppCache.init();
   await Firebase.initializeApp();
+  await AppCache.init();
   runApp(const FlagMode());
 }
 

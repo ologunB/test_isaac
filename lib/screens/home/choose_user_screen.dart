@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flagmodeapp12/screens/home/chat_details_page.dart';
 import 'package:flutter/material.dart';
 
+import '../../models/user_model.dart';
 import '../../styles/colors.dart';
 
 class ChooseUserScreen extends StatefulWidget {
@@ -11,6 +15,19 @@ class ChooseUserScreen extends StatefulWidget {
 }
 
 class _ChooseUserScreenState extends State<ChooseUserScreen> {
+  List<UserModel> users = [];
+  @override
+  initState() {
+    FirebaseFirestore.instance.collection('users').get().then((value) {
+      value.docs.forEach((element) {
+        UserModel user = UserModel.fromJson(element.data());
+        users.add(user);
+      });
+      setState(() {});
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,30 +83,27 @@ class _ChooseUserScreenState extends State<ChooseUserScreen> {
           ),
         ),
         Expanded(
-          child: GestureDetector(
-            onTap: () {
-              FocusScope.of(context).requestFocus(
-                new FocusNode(),
+          child: ListView.builder(
+            itemCount: users.length,
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
+            itemBuilder: (context, i) {
+              UserModel user = users[i];
+              if (user.uid == FirebaseAuth.instance.currentUser!.uid) {
+                return SizedBox();
+              }
+              return ListTile(
+                title: Text(user.name!),
+                onTap: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatDetailScreen(user: user),
+                    ),
+                  );
+                },
               );
             },
-            child: ListView.builder(
-              itemCount: 18,
-              shrinkWrap: true,
-              padding: EdgeInsets.zero,
-              itemBuilder: (context, i) {
-                return ListTile(
-                  title: Text('User $i'),
-                  onTap: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatDetailScreen(index: 1),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
           ),
         ),
       ]),
