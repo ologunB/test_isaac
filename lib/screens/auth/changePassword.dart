@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
+import 'package:flagmodeapp12/widgets/utils.dart';
 import 'package:flutter/material.dart';
 
 class ChangePassowrd extends StatefulWidget {
@@ -9,12 +11,7 @@ class ChangePassowrd extends StatefulWidget {
 }
 
 class _ChangePassowrdState extends State<ChangePassowrd> {
-  late bool _passwordVisble;
-  @override
-  void initState() {
-    _passwordVisble = false;
-    super.initState();
-  }
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -80,18 +77,19 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
             child: Column(
               children: [
                 TextFormField(
-                  obscureText: _passwordVisble,
+                  controller: old1,
+                  obscureText: _obscureText,
                   decoration: InputDecoration(
                     filled: true,
                     suffixIcon: IconButton(
                       color: AppColors.darkGrey,
                       onPressed: () {
-                        _passwordVisble = !_passwordVisble;
+                        _obscureText = !_obscureText;
                         setState(() {});
                       },
-                      icon: Icon(_passwordVisble
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(_obscureText
+                          ? Icons.visibility
+                          : Icons.visibility_off),
                     ),
                     helperStyle: const TextStyle(color: Colors.white),
                     border: const OutlineInputBorder(
@@ -116,18 +114,19 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
             child: Column(
               children: [
                 TextFormField(
-                  obscureText: _passwordVisble,
+                  controller: new1,
+                  obscureText: _obscureText,
                   decoration: InputDecoration(
                     filled: true,
                     suffixIcon: IconButton(
                       color: AppColors.darkGrey,
                       onPressed: () {
-                        _passwordVisble = !_passwordVisble;
+                        _obscureText = !_obscureText;
                         setState(() {});
                       },
-                      icon: Icon(_passwordVisble
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(_obscureText
+                          ? Icons.visibility
+                          : Icons.visibility_off),
                     ),
                     helperStyle: const TextStyle(color: Colors.white),
                     border: const OutlineInputBorder(
@@ -152,18 +151,19 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
             child: Column(
               children: [
                 TextFormField(
-                  obscureText: _passwordVisble,
+                  controller: new2,
+                  obscureText: _obscureText,
                   decoration: InputDecoration(
                     filled: true,
                     suffixIcon: IconButton(
                       color: AppColors.darkGrey,
                       onPressed: () {
-                        _passwordVisble = !_passwordVisble;
+                        _obscureText = !_obscureText;
                         setState(() {});
                       },
-                      icon: Icon(_passwordVisble
-                          ? Icons.visibility_off
-                          : Icons.visibility),
+                      icon: Icon(_obscureText
+                          ? Icons.visibility
+                          : Icons.visibility_off),
                     ),
                     helperStyle: const TextStyle(color: Colors.white),
                     border: const OutlineInputBorder(
@@ -182,19 +182,26 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
           ),
           Card(
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: changwPassword,
               child: Padding(
                 padding: const EdgeInsets.all(18.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      'Verify',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
+                  children: [
+                    _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ))
+                        : const Text(
+                            'Verify',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16),
+                          ),
                   ],
                 ),
               ),
@@ -208,4 +215,60 @@ class _ChangePassowrdState extends State<ChangePassowrd> {
       ),
     );
   }
+
+  bool _isLoading = false;
+
+  final TextEditingController old1 = TextEditingController();
+  final TextEditingController new1 = TextEditingController();
+  final TextEditingController new2 = TextEditingController();
+  void changwPassword() async {
+    if (old1.text.isEmpty) {
+      Utils.showNotif(context, 'Old Password cannot be empty');
+      return;
+    }
+    if (new1.text.isEmpty) {
+      Utils.showNotif(context, 'New Password is empty');
+      return;
+    }
+    if (new1.text != new2.text) {
+      Utils.showNotif(context, 'New Passwords are not the same');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+    String email = firebaseAuth.currentUser!.email!;
+
+    try {
+      UserCredential userCredential = await firebaseAuth
+          .signInWithEmailAndPassword(email: email.trim(), password: old1.text);
+
+      User user = userCredential.user!;
+      if (userCredential.user != null) {
+        await user.updatePassword(new1.text);
+        new1.clear();
+        new2.clear();
+        old1.clear();
+
+        Utils.showNotif(context, 'Password changes successfully');
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } on FirebaseAuthException catch (e) {
+      Utils.showNotif(context, e.message!);
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      Utils.showNotif(context, e.toString());
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 }
+
+/* */

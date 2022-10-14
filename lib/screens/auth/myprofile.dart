@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
+import 'package:flagmodeapp12/widgets/local_storage.dart';
+import 'package:flagmodeapp12/widgets/utils.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -11,6 +15,16 @@ class MyProfile extends StatefulWidget {
 }
 
 class _MyProfileState extends State<MyProfile> {
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+
+  @override
+  void initState() {
+    name.text = AppCache.getName();
+    email.text = FirebaseAuth.instance.currentUser!.email!;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +34,9 @@ class _MyProfileState extends State<MyProfile> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
-                onTap: () {},
+                onTap : () {
+                  Navigator.pop(context);
+                },
                 child: Text(
                   'Cancel',
                   style: TextStyle(
@@ -37,24 +53,27 @@ class _MyProfileState extends State<MyProfile> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: InkWell(
-              onTap: () {},
-              child: Text(
-                'Edit Profile',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600),
-              ),
+            child: Text(
+              'Edit Profile',
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600),
             ),
           ),
           SizedBox(
-            width: 83,
+            width: 50,
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: InkWell(
-              onTap: () {},
+            child: ElevatedButton(
+              style: ButtonStyle(
+                elevation: MaterialStateProperty.all(0),
+                backgroundColor: MaterialStateProperty.all(AppColors.white),
+              ),
+              onPressed: () {
+                saveProfile();
+              },
               child: Text(
                 'Done',
                 style: TextStyle(
@@ -182,7 +201,9 @@ class _MyProfileState extends State<MyProfile> {
                       fontWeight: FontWeight.w400,
                       color: AppColors.dudu),
                 ),
-                TextField(),
+                TextField(
+                  controller: name,
+                ),
                 Text(
                   'Email Address',
                   style: TextStyle(
@@ -191,7 +212,10 @@ class _MyProfileState extends State<MyProfile> {
                       color: AppColors.dudu),
                 ),
                 SizedBox(height: 4),
-                TextField(),
+                TextField(
+                  controller: email,
+                  readOnly: true,
+                ),
               ],
             ),
           ),
@@ -201,4 +225,14 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   File? image;
+
+  saveProfile() {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .update({"name": name.text});
+
+    AppCache.saveName(name.text);
+    Utils.showNotif(context, "Profile Updated");
+  }
 }

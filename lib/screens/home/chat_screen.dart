@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flagmodeapp12/screens/auth/BusinessDetails.dart';
 import 'package:flagmodeapp12/screens/auth/myprofile.dart';
 import 'package:flagmodeapp12/screens/auth/settings.dart';
+import 'package:flagmodeapp12/screens/auth/splash.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
 import 'package:flagmodeapp12/widgets/chats_page.dart';
 import 'package:flagmodeapp12/widgets/groups_page.dart';
@@ -65,14 +67,23 @@ class _ChatScreenState extends State<ChatScreen> {
                     Icons.more_vert,
                     color: Colors.black,
                   ),
-                  onSelected: (int a) {
+                  onSelected: (int a) async {
                     print(a);
-                    if (a == 1) {
+                    if (a == 5) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const MyProfile()),
+                          builder: (context) => const Settings(),
+                        ),
                       );
+                    }
+                    if (a == 10) {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.pushAndRemoveUntil(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (context) => SplashScreen()),
+                          (route) => false);
                     }
                   },
                   itemBuilder: (BuildContext cContext) => <PopupMenuEntry<int>>[
@@ -91,6 +102,13 @@ class _ChatScreenState extends State<ChatScreen> {
                         const PopupMenuItem<int>(
                           value: 5,
                           child: Text('Settings'),
+                        ),
+                        const PopupMenuItem<int>(
+                          value: 10,
+                          child: Text(
+                            'Logout',
+                            style: TextStyle(color: Colors.red),
+                          ),
                         ),
                       ]),
             ),
@@ -224,9 +242,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                 : AppColors.lightGrey,
                           ),
                         ),
-
-
-                        
                       ],
                     ),
                   ),

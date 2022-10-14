@@ -1,19 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flagmodeapp12/screens/auth/welcomesecreen.dart';
+import 'package:flagmodeapp12/screens/auth/login_screen.dart';
 import 'package:flagmodeapp12/widgets/back_button.dart';
 import 'package:flagmodeapp12/widgets/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flagmodeapp12/styles/colors.dart';
 
-class VerifyScreen extends StatefulWidget {
-  const VerifyScreen({Key? key}) : super(key: key);
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  State<VerifyScreen> createState() => _VerifyScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _VerifyScreenState extends State<VerifyScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -139,14 +140,22 @@ class _VerifyScreenState extends State<VerifyScreen> {
                       padding: const EdgeInsets.all(18.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Sign In',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          ),
+                        children: [
+                          _isLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Text(
+                                  'Sign up',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16),
+                                ),
                         ],
                       ),
                     ),
@@ -164,6 +173,8 @@ class _VerifyScreenState extends State<VerifyScreen> {
     );
   }
 
+  bool _isLoading = false;
+
   void createAccount() async {
     if (fullNameController.text.isEmpty) {
       Utils.showNotif(context, 'Enter full name');
@@ -175,26 +186,51 @@ class _VerifyScreenState extends State<VerifyScreen> {
     }
     if (passwordController.text.isEmpty) {
       Utils.showNotif(context, 'Password is empty');
-
       return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
     FirebaseAuth firebaseAuth = FirebaseAuth.instance;
     String email = emailController.text;
     String password = passwordController.text;
     try {
-      UserCredential userCredential = await firebaseAuth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential =
+          await firebaseAuth.createUserWithEmailAndPassword(
+              email: email.trim(), password: password);
 
       if (userCredential.user != null) {
+        await userCredential.user?.sendEmailVerification();
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user?.uid)
+            .set({
+          'name': fullNameController.text,
+          'email': email,
+          'uid': userCredential.user?.uid,
+        });
         Navigator.pushAndRemoveUntil(
             context,
-            CupertinoPageRoute(builder: (context) => WelcomeScreen()),
+            CupertinoPageRoute(builder: (context) => LoginScreen()),
             (route) => false);
+        Utils.showNotif(
+            context, 'An email has been sent to you to verify your account');
       }
+      setState(() {
+        _isLoading = false;
+      });
     } on FirebaseAuthException catch (e) {
       Utils.showNotif(context, e.message!);
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       Utils.showNotif(context, e.toString());
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 }

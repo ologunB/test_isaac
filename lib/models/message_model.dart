@@ -15,6 +15,18 @@ List<User> allUsers = [
   User(id: 3, name: 'Peter', image: 'assets/images/peter.png'),
   User(id: 4, name: 'Micheal', image: 'assets/images/micheal.png'),
   User(id: 5, name: 'White', image: 'assets/images/white.png'),
+  User(id: 0, name: 'James', image: 'assets/images/james.png'),
+  User(id: 1, name: 'Jane', image: 'assets/images/jane.png'),
+  User(id: 2, name: 'Kane', image: 'assets/images/kane.png'),
+  User(id: 3, name: 'Peter', image: 'assets/images/peter.png'),
+  User(id: 4, name: 'Micheal', image: 'assets/images/micheal.png'),
+  User(id: 5, name: 'White', image: 'assets/images/white.png'),
+  User(id: 0, name: 'James', image: 'assets/images/james.png'),
+  User(id: 1, name: 'Jane', image: 'assets/images/jane.png'),
+  User(id: 2, name: 'Kane', image: 'assets/images/kane.png'),
+  User(id: 3, name: 'Peter', image: 'assets/images/peter.png'),
+  User(id: 4, name: 'Micheal', image: 'assets/images/micheal.png'),
+  User(id: 5, name: 'White', image: 'assets/images/white.png'),
 ];
 
 List<Message> chats = [
