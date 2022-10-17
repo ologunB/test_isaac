@@ -233,24 +233,31 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 25, vertical: 8),
-                          child: Text(
-                            'Groups',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: _currentPage == 1
-                                  ? AppColors.white
-                                  : AppColors.darkGrey,
+                        InkWell(
+                          onTap: () {
+                            _controller.animateToPage(1,
+                                duration: const Duration(milliseconds: 100),
+                                curve: Curves.linear);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 25, vertical: 8),
+                            child: Text(
+                              'Groups',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                color: _currentPage == 1
+                                    ? AppColors.white
+                                    : AppColors.darkGrey,
+                              ),
                             ),
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(40),
-                            color: _currentPage == 1
-                                ? AppColors.primaryColor
-                                : AppColors.lightGrey,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(40),
+                              color: _currentPage == 1
+                                  ? AppColors.primaryColor
+                                  : AppColors.lightGrey,
+                            ),
                           ),
                         ),
                       ],

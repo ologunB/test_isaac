@@ -8,7 +8,7 @@ class UserModel {
 
   UserModel({this.uid, this.name, this.email, this.image});
 
-  UserModel.fromJson(Map<String, dynamic> json) {
+  UserModel.fromJson(dynamic json) {
     uid = json['uid'];
     name = json['name'];
     image = json['image'];
@@ -16,7 +16,7 @@ class UserModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['uid'] = this.uid;
     data['name'] = this.name;
     data['image'] = this.image;
