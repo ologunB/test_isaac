@@ -216,6 +216,9 @@ class _MyProfileState extends State<MyProfile> {
                     setState(() {});
                   },
                 ),
+                SizedBox(
+                  height: 24,
+                ),
                 Text(
                   'Email Address',
                   style: TextStyle(
@@ -231,7 +234,7 @@ class _MyProfileState extends State<MyProfile> {
               ],
             ),
           ),
-        )
+        ),
       ]),
     );
   }
