@@ -12,4 +12,12 @@ class Utils {
       flushbarPosition: FlushbarPosition.TOP,
     ).show(context);
   }
+
+  static String generateId(from, to) {
+    if (from.hashCode > to.hashCode) {
+      return from + to;
+    } else {
+      return to + from;
+    }
+  }
 }

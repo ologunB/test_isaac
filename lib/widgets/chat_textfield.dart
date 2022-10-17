@@ -64,7 +64,14 @@ class _ChatTextFieldState extends State<ChatTextField> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30.0),
                     borderSide: const BorderSide(
-                      color: Colors.white,
+                      color: Colors.black26,
+                      width: 0.2,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    borderSide: const BorderSide(
+                      color: Colors.black26,
                       width: 0.2,
                     ),
                   ),

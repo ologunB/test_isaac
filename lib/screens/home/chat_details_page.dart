@@ -1,10 +1,16 @@
+import 'dart:async';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flagmodeapp12/widgets/chat_textfield.dart';
+import 'package:flagmodeapp12/widgets/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:keyboard_attachable/keyboard_attachable.dart';
-
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import '../../models/message_model.dart';
 import '../../models/user_model.dart';
 import '../../styles/colors.dart';
+import '../../widgets/utils.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key, required this.user});
@@ -17,22 +23,61 @@ class ChatDetailScreen extends StatefulWidget {
 class _ChatDetailScreenState extends State<ChatDetailScreen> {
   TextEditingController textController = TextEditingController();
   ScrollController scrollController = ScrollController();
+  StreamSubscription<bool>? keyboardStream;
+  StreamSubscription? listStream;
+
+  List<MessageModel> messageList = [];
+
+  @override
+  initState() {
+    super.initState();
+
+    String id = Utils.generateId(AppCache.getUser().uid, widget.user.uid);
+    listStream =
+        dbRef.child('Messages/Messages/$id/').onChildAdded.listen((event) {
+      messageList.add(MessageModel.fromJson(event.snapshot.value));
+      setState(() {});
+    });
+
+    KeyboardVisibilityController keyboardVisibilityController =
+        KeyboardVisibilityController();
+
+    keyboardStream =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (visible) {
+        scrollController.animateTo(
+          scrollController.position.minScrollExtent - 600,
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 300),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    keyboardStream?.cancel();
+    listStream?.cancel();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: FooterLayout(
         footer: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: ChatTextField(
             textController: textController,
             sendButtonColor: AppColors.primaryColor,
             onSend: (a) {
               scrollController.animateTo(
-                  scrollController.position.maxScrollExtent + 20,
+                  scrollController.position.maxScrollExtent + 200,
                   curve: Curves.easeOut,
                   duration: const Duration(milliseconds: 300));
-              print(a);
+              onSendMessage();
             },
           ),
         ),
@@ -118,39 +163,78 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                FocusScope.of(context).requestFocus(
-                  new FocusNode(),
-                );
+                FocusScope.of(context).requestFocus(FocusNode());
               },
-              child: ListView.builder(
-                itemCount: 18,
-                shrinkWrap: true,
-                controller: scrollController,
-                padding: EdgeInsets.zero,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: BubbleNormal(
-                      text:
-                          'Oh yeah, i got those yesterday. Already started working on the project. Hope we can have a meeting today,',
-                      isSender: index.isEven,
-                      color: index.isOdd
-                          ? AppColors.lightGrey
-                          : AppColors.primaryColor,
-                      tail: true,
-                      textStyle: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontStyle: FontStyle.normal,
-                          fontSize: 16,
-                          color: index.isOdd ? Colors.black : AppColors.white),
-                    ),
-                  );
-                },
+              child: RotatedBox(
+                quarterTurns: 2,
+                child: NotificationListener<OverscrollIndicatorNotification>(
+                  onNotification: (overscroll) {
+                    overscroll.disallowIndicator();
+                    return true;
+                  },
+                  child: ListView.builder(
+                    itemCount: messageList.length,
+                    shrinkWrap: true,
+                    reverse: true,
+                    controller: scrollController,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) {
+                      MessageModel msg = messageList[index];
+
+                      bool fromMe = msg.fromUid == AppCache.getUser().uid;
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: RotatedBox(
+                          quarterTurns: 2,
+                          child: BubbleNormal(
+                            text: msg.text!,
+                            isSender: fromMe,
+                            color: !fromMe
+                                ? AppColors.lightGrey
+                                : AppColors.primaryColor,
+                            tail: true,
+                            textStyle: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontStyle: FontStyle.normal,
+                                fontSize: 16,
+                                color:
+                                    !fromMe ? Colors.black : AppColors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),
         ]),
       ),
     );
+  }
+
+  DatabaseReference dbRef = FirebaseDatabase.instance.ref();
+
+  onSendMessage() {
+    int now = DateTime.now().microsecondsSinceEpoch;
+
+    UserModel fromUser = AppCache.getUser();
+    UserModel toUser = widget.user;
+
+    String messageId = Utils.generateId(toUser.uid, fromUser.uid);
+
+    Map data = {
+      'text': textController.text,
+      'created_at': now,
+      'from_uid': fromUser.uid,
+      'from_name': fromUser.name,
+      'from_image': fromUser.image,
+      'to_uid': toUser.uid,
+      'to_name': toUser.name,
+      'to_image': toUser.image,
+    };
+    dbRef.child('Messages/List/${fromUser.uid}/${toUser.uid}').set(data);
+    dbRef.child('Messages/List/${toUser.uid}/${fromUser.uid}').set(data);
+    dbRef.child('Messages/Messages/$messageId').push().set(data);
   }
 }

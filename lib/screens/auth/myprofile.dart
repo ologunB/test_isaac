@@ -125,8 +125,7 @@ class _MyProfileState extends State<MyProfile> {
                               borderRadius: BorderRadius.circular(50),
                               child: image == null
                                   ? CachedNetworkImage(
-                                      imageUrl: imageUrl ??
-                                          'https://picsum.phommmtos/200',
+                                      imageUrl: imageUrl ?? '200',
                                       placeholder: (context, url) =>
                                           Image.asset(
                                               'assets/images/placeholder.png'),
