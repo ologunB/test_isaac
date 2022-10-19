@@ -125,7 +125,8 @@ class _MyProfileState extends State<MyProfile> {
                               borderRadius: BorderRadius.circular(50),
                               child: image == null
                                   ? CachedNetworkImage(
-                                      imageUrl: imageUrl ?? '200',
+                                      imageUrl: imageUrl ??
+                                          'https://firebasestorage.googleapis.com/v0/b/testisaac-4c1bf.appspot.com/o/placeholder.png?alt=media&token=38bb61c8-0807-4bfd-84b1-503f97dc9bb4',
                                       placeholder: (context, url) =>
                                           Image.asset(
                                               'assets/images/placeholder.png'),

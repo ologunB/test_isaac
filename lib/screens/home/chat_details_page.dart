@@ -35,8 +35,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     String id = Utils.generateId(AppCache.getUser().uid, widget.user.uid);
     listStream =
         dbRef.child('Messages/Messages/$id/').onChildAdded.listen((event) {
+      print(event.snapshot);
       messageList.add(MessageModel.fromJson(event.snapshot.value));
       setState(() {});
+      if (scrollController.hasClients)
+        scrollController.animateTo(
+            scrollController.position.maxScrollExtent + 400,
+            curve: Curves.easeOut,
+            duration: const Duration(milliseconds: 300));
     });
 
     KeyboardVisibilityController keyboardVisibilityController =
@@ -73,10 +79,6 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             textController: textController,
             sendButtonColor: AppColors.primaryColor,
             onSend: (a) {
-              scrollController.animateTo(
-                  scrollController.position.maxScrollExtent + 200,
-                  curve: Curves.easeOut,
-                  duration: const Duration(milliseconds: 300));
               onSendMessage();
             },
           ),
@@ -189,16 +191,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                           child: BubbleNormal(
                             text: msg.text!,
                             isSender: fromMe,
-                            color: !fromMe
-                                ? AppColors.lightGrey
-                                : AppColors.primaryColor,
+                            color: fromMe
+                                ? AppColors.primaryColor
+                                : AppColors.lightGrey,
                             tail: true,
                             textStyle: TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontStyle: FontStyle.normal,
                                 fontSize: 16,
-                                color:
-                                    !fromMe ? Colors.black : AppColors.white),
+                                color: fromMe ? Colors.white : Colors.black),
                           ),
                         ),
                       );
@@ -223,7 +224,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
     String messageId = Utils.generateId(toUser.uid, fromUser.uid);
 
-    Map data = {
+    Map<String, dynamic> data = {
       'text': textController.text,
       'created_at': now,
       'from_uid': fromUser.uid,
@@ -233,6 +234,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       'to_name': toUser.name,
       'to_image': toUser.image,
     };
+
     dbRef.child('Messages/List/${fromUser.uid}/${toUser.uid}').set(data);
     dbRef.child('Messages/List/${toUser.uid}/${fromUser.uid}').set(data);
     dbRef.child('Messages/Messages/$messageId').push().set(data);

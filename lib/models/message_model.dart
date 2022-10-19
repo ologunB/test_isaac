@@ -6,6 +6,7 @@ class MessageModel {
   String? toName;
   String? toUid;
   String? toImage;
+  int? createdAt;
 
   MessageModel(
       {this.text,
@@ -14,7 +15,8 @@ class MessageModel {
       this.fromImage,
       this.toImage,
       this.toName,
-      this.toUid});
+      this.toUid,
+      this.createdAt});
 
   MessageModel.fromJson(dynamic json) {
     text = json['text'];
@@ -24,6 +26,7 @@ class MessageModel {
     toName = json['to_name'];
     toImage = json['to_image'];
     toUid = json['to_uid'];
+    createdAt = json['created_at'];
   }
 
   Map<String, dynamic> toJson() {
@@ -35,6 +38,7 @@ class MessageModel {
     data['to_name'] = this.toName;
     data['to_image'] = this.toImage;
     data['to_uid'] = this.toUid;
+    data['created_at'] = this.createdAt;
     return data;
   }
 }

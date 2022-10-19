@@ -21,15 +21,22 @@ class _ChatspageState extends State<Chatspage> {
   DatabaseReference dbRef = FirebaseDatabase.instance.ref();
   StreamSubscription? listStream;
 
-  List<MessageModel> messageList = [];
+  Map<String, MessageModel> messageList = {};
 
   @override
   void initState() {
     listStream = dbRef
         .child('Messages/List/${AppCache.getUser().uid}')
-        .onChildAdded
+        .onValue
         .listen((event) {
-      messageList.add(MessageModel.fromJson(event.snapshot.value));
+      if (event.snapshot.value != null) {
+        Map map = event.snapshot.value as Map;
+        map.forEach((key, value) {
+          messageList[key] = MessageModel.fromJson(value);
+        });
+      } else {
+        messageList.clear();
+      }
       setState(() {});
     });
 
@@ -67,15 +74,20 @@ class _ChatspageState extends State<Chatspage> {
                       child: Divider(),
                     ),
                     itemBuilder: (BuildContext context, int index) {
-                      MessageModel msg = messageList[index];
+                      MessageModel msg = messageList.values.toList()[index];
+                      bool fromMe = msg.fromUid == AppCache.getUser().uid;
+
                       return InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) {
                               return ChatDetailScreen(
-                                user:
-                                    UserModel(name: msg.toName, uid: msg.toUid),
+                                user: UserModel(
+                                    name: fromMe ? msg.toName : msg.fromName,
+                                    uid: fromMe ? msg.toUid : msg.fromUid,
+                                    image:
+                                        fromMe ? msg.toImage : msg.fromImage),
                               );
                             }),
                           );
@@ -85,7 +97,10 @@ class _ChatspageState extends State<Chatspage> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(30),
                               child: CachedNetworkImage(
-                                imageUrl: msg.toImage ?? 'cc',
+                                imageUrl: (fromMe
+                                        ? msg.toImage
+                                        : msg.fromImage) ??
+                                    'https://firebasestorage.googleapis.com/v0/b/testisaac-4c1bf.appspot.com/o/placeholder.png?alt=media&token=38bb61c8-0807-4bfd-84b1-503f97dc9bb4',
                                 placeholder: (context, url) => Image.asset(
                                     'assets/images/placeholder.png'),
                                 errorWidget: (context, url, error) =>
@@ -104,7 +119,7 @@ class _ChatspageState extends State<Chatspage> {
                                     Row(
                                       children: [
                                         Text(
-                                          msg.toName!,
+                                          fromMe ? msg.toName! : msg.fromName!,
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
@@ -112,7 +127,7 @@ class _ChatspageState extends State<Chatspage> {
                                         ),
                                         const Spacer(),
                                         Text(
-                                          'Yesterday',
+                                          parseDate(msg.createdAt),
                                           style: TextStyle(
                                               fontSize: 11,
                                               color: AppColors.primaryColor),
@@ -122,6 +137,13 @@ class _ChatspageState extends State<Chatspage> {
                                     const SizedBox(height: 6),
                                     Row(
                                       children: [
+                                        fromMe
+                                            ? Icon(
+                                                Icons.done_all,
+                                                size: 14,
+                                                color: AppColors.primaryColor,
+                                              )
+                                            : const SizedBox(),
                                         Text(
                                           msg.text!,
                                           style: TextStyle(
@@ -133,6 +155,7 @@ class _ChatspageState extends State<Chatspage> {
                                         Container(
                                           height: 16,
                                           width: 16,
+
                                           //  alignment: Alignment.center,
                                           decoration: BoxDecoration(
                                               color: AppColors.primaryColor,
@@ -163,5 +186,23 @@ class _ChatspageState extends State<Chatspage> {
               ),
       ],
     );
+  }
+
+  String parseDate(int? timestamp) {
+    if (timestamp == null) return '';
+    DateTime date = DateTime.fromMicrosecondsSinceEpoch(timestamp);
+    DateTime now = DateTime.now();
+
+    if (date.difference(now).inSeconds.abs() < 60) {
+      return 'Now';
+    } else if (date.day == now.day) {
+      return '${date.hour}:${date.minute < 10 ? '0' : ''}${date.minute} ${date.hour > 12 ? 'PM' : 'AM'}';
+    } else if (date.day == now.day - 1) {
+      return 'Yesterday';
+    } else if (date.day == now.day - 2) {
+      return '2 days ago';
+    } else {
+      return '${date.day}/${date.month}/${date.year}';
+    }
   }
 }
